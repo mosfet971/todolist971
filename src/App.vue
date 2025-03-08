@@ -147,7 +147,7 @@ body {
 
 
 .col {
-  height: 47vh !important;
+  height: 40vh !important;
   overflow-y: scroll;
   text-align: center;
   align-items: center;
