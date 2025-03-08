@@ -1,0 +1,20 @@
+{
+  "short_name": "todolist971",
+  "name": "todolist971",
+  "icons": [
+    {
+      "src": "/todolist971/icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/todolist971/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/todolist971/",
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "theme_color": "#FFFFFF"
+}
