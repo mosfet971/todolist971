@@ -72,6 +72,9 @@ const lists = ref([
 
 watchEffect(()=>{
   for (let i = 0; i < lists.value.length; i++) {
+    lists.value[i] = lists.value[i].filter((v)=>v.name!=="")
+  }
+  for (let i = 0; i < lists.value.length; i++) {
     if (lists.value[i].length<30) {
       let need = 30 - lists.value[i].length;
       for (let j = 0; j < need; j++) {
