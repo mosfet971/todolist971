@@ -1,6 +1,7 @@
 <template>
   <button class="btn btn-primary" style="margin: 0.3em; width: 9em !important; height: 2.5em !important; overflow: hidden;" v-on:click="addTask()">Добавить задачу</button>
   <VueDraggable class="btn btn-danger" style="margin: 0.3em; width: 9em !important; height: 2.5em !important; overflow: hidden;" group="task" v-model="trashList">Корзина</VueDraggable>
+  <p style="display: inline;">Перетаскивайте задачи между списками</p>
   <div class="container text-left mpzero">
     <div class="row mpzero" style="width: 70em;">
       <VueDraggable class="col mpzero" v-model="lists[0]" animation="150" group="task"
@@ -8,12 +9,12 @@
         <table class="table table-light">
           <thead>
             <th>
-            <td style="width: calc(100vw/3);">Входящие:</td>
+            <td>Входящие:</td>
             </th>
           </thead>
           <tbody class="el_table">
             <tr v-for="item in lists[0]" :key="item.id">
-              <td style="width: calc(100vw/3);">{{ item.name }}</td>
+              <td>{{ item.name }}</td>
             </tr>
           </tbody>
         </table>
@@ -23,7 +24,7 @@
         <table class="table table-light">
           <thead>
             <th>
-            <td style="width: calc(100vw/3);">Проекты:</td>
+            <td>Проекты:</td>
             </th>
           </thead>
           <tbody class="el_table">
@@ -38,12 +39,29 @@
         <table class="table table-light">
           <thead>
             <th>
-            <td style="width: calc(100vw/3);">Свободные задачи:</td>
+            <td>Свободные задачи:</td>
             </th>
           </thead>
           <tbody class="el_table">
             <tr v-for="item in lists[2]" :key="item.id">
-              <td style="width: calc(100vw/3);">{{ item.name }}</td>
+              <td>{{ item.name }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </VueDraggable>
+    </div>
+    <div class="row mpzero" style="width: 100vw; overflow-x: scroll; display: block; height: 45vh !important; white-space:nowrap; overflow-y: hidden;">
+      <VueDraggable v-for="i in daysListIds" :key="i" class="col mpzero dayList" v-model="lists[i]" animation="150" group="task"
+        target=".el_table">
+        <table class="table table-light">
+          <thead>
+            <th>
+            <td>{{getFormattedDate(new Date())}}</td>
+            </th>
+          </thead>
+          <tbody class="el_table">
+            <tr v-for="item in lists[i]" :key="item.id">
+              <td>{{ item.name }}</td>
             </tr>
           </tbody>
         </table>
@@ -58,17 +76,19 @@ import { VueDraggable } from 'vue-draggable-plus'
 
 const trashList = ref([]);
 
-const lists = ref([
-  [
+let daysNumber = 15;
+let mainListsNumber = 3;
 
-  ],
-  [
+let initListsValue = [];
+let daysListIds = [];
+for (let i = 0; i < mainListsNumber+daysNumber; i++) {
+  initListsValue.push([]);
+  if(i>2) {
+    daysListIds.push(i);
+  }
+}
 
-  ],
-  [
-
-  ]
-]);
+const lists = ref(initListsValue);
 
 watchEffect(()=>{
   for (let i = 0; i < lists.value.length; i++) {
@@ -105,17 +125,7 @@ onMounted(() => {
   if (localStorage.getItem("lists") == null) {
     console.log(localStorage.getItem("lists") == null);
     localStorage.setItem("lists", JSON.stringify({
-      val: [
-        [
-
-        ],
-        [
-
-        ],
-        [
-
-        ]
-      ]
+      val: initListsValue
     }));
   }
 
@@ -139,6 +149,18 @@ function addTask() {
   }
 }
 
+function getFormattedDate(date) {
+  var year = date.getFullYear();
+
+  var month = (1 + date.getMonth()).toString();
+  month = month.length > 1 ? month : '0' + month;
+
+  var day = date.getDate().toString();
+  day = day.length > 1 ? day : '0' + day;
+  
+  return month + '/' + day + '/' + year;
+}
+
 </script>
 <style scoped>
 html,
@@ -146,8 +168,6 @@ body {
   padding: 0;
   margin: 0;
 }
-
-
 
 .col {
   height: 40vh !important;
@@ -162,11 +182,12 @@ body {
 tr {
   font-size: 80%;
   height: 2em !important;
-  
 }
 
 td {
   padding: 0;
+  padding-top: 0.1em;
+  width: 100em;
 }
 
 th {
@@ -176,5 +197,10 @@ th {
 .mpzero {
   margin: 0;
   padding: 0;
+}
+
+.dayList {
+  width: 20em;
+  display: inline-block;
 }
 </style>
