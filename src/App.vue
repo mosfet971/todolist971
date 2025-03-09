@@ -56,7 +56,7 @@
         <table class="table table-light">
           <thead>
             <th>
-            <td>{{getFormattedDate(new Date())}}</td>
+            <td>{{getFormattedDate(listIdToDate[i])}}</td>
             </th>
           </thead>
           <tbody class="el_table">
@@ -83,10 +83,24 @@ let initListsValue = [];
 let daysListIds = [];
 for (let i = 0; i < mainListsNumber+daysNumber; i++) {
   initListsValue.push([]);
-  if(i>2) {
+  if (i>2) {
     daysListIds.push(i);
   }
 }
+
+let listIdToDate = ref([]);
+
+function generateDates() {
+  let num = 0;
+  for (const i of daysListIds) {
+    let idate = new Date();
+    idate.setDate(idate.getDate() + num);
+    listIdToDate.value[i] = idate;
+    num++;
+  }
+}
+
+generateDates();
 
 const lists = ref(initListsValue);
 
@@ -127,17 +141,38 @@ onMounted(() => {
     localStorage.setItem("lists", JSON.stringify({
       val: initListsValue
     }));
+    localStorage.setItem("prevAcessDate", Date.now().toString());
   }
+
+  updateCalendar();
+  setInterval(updateCalendar, 10000);
+
 
   lists.value = JSON.parse(localStorage.getItem("lists")).val;
 });
 
-function onUpdate() {
 
+function updateCalendar() {
+  let dateDiff = dateDiffInDays(new Date(parseInt(localStorage.getItem("prevAcessDate"))), new Date());
+  for(let i = 0; i < dateDiff; i++) {
+    console.log(i);
+    for(let j = mainListsNumber; j < mainListsNumber+daysNumber+1; j++) {
+      console.log("j: ", j);
+      if(j==3) {
+        for(const k of lists.value[j]) {
+          lists.value[2].push(k);
+        }
+      } else if (j==(mainListsNumber+daysNumber)) {
+        lists.value[j-1] = [];
+      } else {
+        lists.value[j-1] = lists.value[j];
+      }
+    }
+  }
+  generateDates();
+  localStorage.setItem("prevAcessDate", Date.now().toString());
 }
-function onAdd() {
 
-}
 function remove(index) {
   //console.log(index);
 }
@@ -149,6 +184,15 @@ function addTask() {
   }
 }
 
+function dateDiffInDays(a, b) {
+  const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+  const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+  return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+}
+
+
 function getFormattedDate(date) {
   var year = date.getFullYear();
 
@@ -158,7 +202,9 @@ function getFormattedDate(date) {
   var day = date.getDate().toString();
   day = day.length > 1 ? day : '0' + day;
   
-  return month + '/' + day + '/' + year;
+  let days = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
+
+  return day + '.' + month + '.' + year + ", " + days[date.getDay()];
 }
 
 </script>
@@ -202,5 +248,6 @@ th {
 .dayList {
   width: 20em;
   display: inline-block;
+  overflow-y: hidden;
 }
 </style>
