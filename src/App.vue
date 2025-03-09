@@ -144,34 +144,32 @@ onMounted(() => {
     localStorage.setItem("prevAcessDate", Date.now().toString());
   }
 
-  updateCalendar();
-  setInterval(updateCalendar, 10000);
+  let savedLists = JSON.parse(localStorage.getItem("lists")).val;
 
-
-  lists.value = JSON.parse(localStorage.getItem("lists")).val;
-});
-
-
-function updateCalendar() {
   let dateDiff = dateDiffInDays(new Date(parseInt(localStorage.getItem("prevAcessDate"))), new Date());
   for(let i = 0; i < dateDiff; i++) {
     console.log(i);
     for(let j = mainListsNumber; j < mainListsNumber+daysNumber+1; j++) {
-      console.log("j: ", j);
       if(j==3) {
-        for(const k of lists.value[j]) {
-          lists.value[2].push(k);
+        for(const k of savedLists[j]) {
+          savedLists[2].push(k);
         }
-      } else if (j==(mainListsNumber+daysNumber)) {
-        lists.value[j-1] = [];
-      } else {
-        lists.value[j-1] = lists.value[j];
+        continue;
       }
+      if (j==(mainListsNumber+daysNumber)) {
+        savedLists[j-1] = [];
+        continue;
+      }
+
+      savedLists[j-1] = savedLists[j];
     }
   }
   generateDates();
   localStorage.setItem("prevAcessDate", Date.now().toString());
-}
+
+  lists.value = savedLists;
+});
+
 
 function remove(index) {
   //console.log(index);
